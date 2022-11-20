@@ -43,6 +43,7 @@
     "element-plus": "^2.2.20",
     "sass": "^1.56.1",
     "sass-loader": "^13.2.0",
+    "v3-scroll": "^1.0.4",
     "vue-router": "^4.1.6"
   }
 }

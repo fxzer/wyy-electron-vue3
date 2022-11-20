@@ -4,9 +4,9 @@ import './samples/node-api'
 import router from "./router"
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
-// import http from './network/request'
+import registerComponents from './utils/globalRegister'
 const app = createApp(App)
-// app.config.globalProperties.http = http
+registerComponents(app)
   app.use(ElementPlus)
   app.use(router)
   app.mount('#app').$nextTick(() => {

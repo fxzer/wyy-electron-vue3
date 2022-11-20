@@ -15,21 +15,9 @@
   </span>
 </template>
 
-<script>
-export default {
-  name: "PlayBtn",
-  props: ['size','position','bgFilter'],
-  data() {
-    return {
-    };
-  },
-  computed: {},
-  watch: {},
-  components: {},
-  methods: {},
-  created() {},
-  mounted() {},
-};
+<script setup lang="ts">
+import { defineProps } from 'vue'
+const props = defineProps(['size','position','bgFilter'])
 </script>
 <style scoped lang='scss'>
 .play-btn {

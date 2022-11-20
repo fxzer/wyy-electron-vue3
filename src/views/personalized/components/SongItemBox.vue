@@ -5,10 +5,10 @@
  * @Description: 
 -->
 <template>
-  <div class="song-box" :class="'song-box--'+size" @dblclick="playSong(songInfo)">
-    <div class="img-box" @click="getSongUrl(songInfo.id)">
+  <div class="song-box" :class="'song-box--'+size" >
+    <div class="img-box"  >
       <img :src="songInfo.picUrl" :alt="name" /> 
-      <PlayBtn  :size="size"  />
+      <PlayBtn  :size="size" />
     </div>
     <div class="song-des"  @click.stop="$emit('bgClick', songInfo.id)">
       <p class="song-name">
@@ -18,7 +18,7 @@
        <span  class="song-alias"  v-if="alias.length">)</span> 
       </p>
       <!-- <p class="song-tags"><span class="tag-item">歌曲翻唱</span></p> -->
-      <p class="artist-name text-of-multi">
+      <p class="artist-name text-of-single">
         <Mtag content="Hi-Res" v-if="isHr"/>
         <Mtag content="SQ" v-if="isSq"/>
         <span v-for="artist in artists" :key="artist.id" class="name-item">{{artist.name}}</span>
@@ -27,61 +27,35 @@
   </div>
 </template>
 
-<script>
-import playSong from '@/mixins/playSong'
-export default {
-  name: 'SongItemBox',
-  props: {
-    size:{
-      type:String,
-      default:'small',
-      validate:(value)=>{
-        return ['small','medium','large'].includes(value)
-      }
-    },
-    songInfo:{
-      type:Object,
-      default:()=>{}
+<script setup lang="ts">
+import { defineProps ,computed } from 'vue'
+const props = defineProps({
+  songInfo: {
+    type: Object,
+    default: () => {
+      return {}
     }
   },
-  mixins:[playSong],
-  data () {
-    return {
-      isFocus:false,
-    }
+  size: {
+    type: String,
+    default: "small",
   },
-  created () { 
-
-  },
-  computed: { 
-    name(){
-      return this.songInfo?.song?.name || ''
-    },
-    artists(){
-      return this.songInfo?.song?.artists || []
-    },
-    alias(){
-      return this.songInfo?.song?.alias || []
-    },
-    isHr(){//Hi-Res音乐
-      return this.songInfo?.song?.hrMusic?.bitrate > 320000
-    },
-    isSq(){//SQ音乐
-      return this.songInfo?.song?.sqMusic?.bitrate > 320000
-    },
-  },
-  components: { 
-
-  },
-  methods: {
-  },
-  mounted () { 
-
-  },
-  watch: { 
-
-  }
-}
+})
+const name = computed(() => {
+    return props?.songInfo?.name || ''
+})
+const alias = computed(() => {
+    return props?.songInfo?.alias  || []
+})
+const artists = computed(() => {
+  return props?.songInfo?.song.artists  || []
+})
+const isHr = computed(() => {
+    return props.songInfo?.song?.hrMusic?.bitrate > 320000
+})
+const isSq = computed(() => {
+    return props.songInfo?.song?.sqMusic?.bitrate > 320000
+})
 </script>
 <style scoped lang='scss'>
 .song-box{
@@ -94,6 +68,7 @@ export default {
     position: relative;
     border-radius: 5px;
     overflow: hidden;
+    min-width: 60px;
     cursor: pointer;
     img{
       display: block;
@@ -136,6 +111,7 @@ export default {
       vertical-align: middle;
       display: flex;
       align-items:center;
+      white-space: nowrap;
       .name-item{
         margin-right: 5px;
         cursor: pointer;

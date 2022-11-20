@@ -11,7 +11,7 @@
       <img :src="mv.picUrl"  /> 
       <span class="play-number"  v-if="bannerShow">
         <i class="iconfont icon-play"></i>
-        <span class="number">{{mv.playCount | playCountFilter}}</span>
+        <span class="number">{{mv.playCount }}</span>
       </span> 
       <span class="iconfont icon-playfill" v-if="palyBtnShow"></span> 
       </div>
@@ -22,50 +22,35 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'MvRecommend',
-  props: {
-    palyBtnShow: {
-      type: Boolean,
-      default: false,
-    },
-    bannerShow:{
-      type:Boolean,
-      default:true
-    },
-    mv:{
-      type:Object,
-      default:()=>{}
-    }
-  },
-  data () {
-    return {
+<script setup lang="ts">
+import { defineProps } from "vue"
+import { useRoute,useRouter } from "vue-router"
+const router = useRouter()
+const route = useRoute()
 
-    }
+const props = defineProps({
+  mv: {
+    type: Object,
+    required: true
   },
-  created () { 
-
+  palyBtnShow: {
+    type: Boolean,
+    default: false
   },
-  computed: { 
-
-  },
-  components: { 
-
-  },
-  methods: {
-   toMvDetail(id){
-      let vid = this.$route.params.id
-      if(id == vid) return
-      this.$router.push({name:'MvDetail',params:{id}})
-    }
-  },
-  mounted () { 
-
-  },
-  watch: { 
-
+  bannerShow: {
+    type: Boolean,
+    default: true
   }
+})
+const toMvDetail = (id: number) => {
+  const vid = Number(route.params.vid)
+  if(vid === id) return
+  router.push({
+    path: '/mvDetail',
+    query: {
+      id
+    }
+  })
 }
 </script>
 <style scoped lang='scss'>
@@ -147,7 +132,7 @@ export default {
   .mv-des{
     width: 100%;
     margin-top: 4px;
-    font-size: 16px;
+    font-size: 14px;
     color: #444;
     line-height: 1.5;
     text-align: left;
@@ -155,6 +140,7 @@ export default {
     .mv-name{
       width: 100%;
       color: #444;
+      margin:10px 0 6px 0;
       &:hover{
         color: #1d1d1d;
       }
@@ -162,6 +148,7 @@ export default {
     .artist-name{
       font-size: 14px;
       color:#747c86;
+       margin:  0;
     }
   }
 }

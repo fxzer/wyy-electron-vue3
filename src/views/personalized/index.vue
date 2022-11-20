@@ -9,7 +9,7 @@
 
 <template>
   <div class="personal-recomend">
-    <el-carousel :interval="3000" autoplay type="card" height="240px"  >
+    <el-carousel :interval="3000" autoplay type="card" height="240px">
       <el-carousel-item v-for="banner in bannerList" :key="banner.bannerId">
         <a class="banner-link" @click="handleBannerClick(banner)">
           <img :src="banner.pic" :alt="banner.typeTitle" />
@@ -26,27 +26,93 @@
       </h2>
       <div
         class="recom-list"
-        v-loading="loading1"
         element-loading-spinner="el-icon-loading"
         element-loading-text="载入中..."
         v-if="algList.length"
       >
         <SongListBox v-for="item in algList" :key="item.id" :algInfo="item" />
       </div>
-      <div v-for="item in algList" :key="item.id">ddd</div>
+      <div
+        v-loading="loading2"
+        element-loading-spinner="el-icon-loading"
+        element-loading-text="载入中..."
+      >
+        <h2 class="area-title">
+          独家放送<i class="iconfont icon-icon_left_arrow"></i>
+        </h2>
+        <div class="mv-list private-content-list">
+          <MvRecommend
+            v-for="item in privateContent"
+            :key="item.id"
+            :mv="item"
+            palyBtnShow
+            :bannerShow="false"
+          />
+        </div>
+      </div>
+
+      <div
+        v-loading="loading3"
+        element-loading-spinner="el-icon-loading"
+        element-loading-text="载入中..."
+      >
+        <h2 class="area-title">
+          最新音乐<i class="iconfont icon-icon_left_arrow"></i>
+        </h2>
+        <div class="mv-list private-content-list">
+          <SongItemBox
+            v-for="item in newSongList"
+            :key="item.id"
+            :songInfo="item"
+            :class="{'is-foucs':focusSongId===item.id}"
+            @bgClick="handleBgClick"
+          />
+        </div>
+      </div>
+
+      <div
+        v-loading="loading4"
+        element-loading-spinner="el-icon-loading"
+        element-loading-text="载入中..."
+      >
+        <h2 class="area-title">
+          推荐MV<i class="iconfont icon-icon_left_arrow"></i>
+        </h2>
+        <div class="mv-list" v-if="mvList.length">
+          <MvRecommend v-for="item in mvList" :key="item.id" :mv="item" />
+        </div>
+      </div>
     </div>
-    <pre>{{algList}}</pre>
   </div>
 </template>
 
 <script setup lang="ts">
 import axios from "axios";
 import { ref, reactive } from "vue";
-import SongListBox from "./components/songListBox.vue";
+// 组件导入
+import SongListBox from "./components/SongListBox.vue";
+import MvRecommend from "./components/MvRecommend.vue";
+import SongItemBox from "./components/SongItemBox.vue";
+
+//类型定义
 interface Banner {
   bannerId: string;
   pic: string;
   typeTitle: string;
+}
+interface AlgInfo {
+  id: number;
+  name: string;
+  picUrl: string;
+  playCount: number;
+  copywriter: string;
+}
+interface MvItem {
+  id: number;
+  name: string;
+  artistName: string;
+  picUrl: string;
+  playCount: number;
 }
 
 //获取轮播图数据
@@ -60,9 +126,9 @@ getBannerData();
 
 // 获取推荐歌单数据
 const loading1 = ref(false);
-const loading2 = ref(false)
-const loading3 = ref(false)
-const loading4 = ref(false)
+const loading2 = ref(false);
+const loading3 = ref(false);
+const loading4 = ref(false);
 interface algList {
   id: string;
   name: string;
@@ -73,102 +139,49 @@ interface algList {
     nickname: string;
   };
 }
-let algList = reactive([]);
+let algList = reactive<AlgInfo[]>([]);
 const getAlgList = async () => {
   loading1.value = true;
-  const  result  = await axios.post("api/personalized?limit=10")  as any;
-  
+  const result = (await axios.post("api/personalized?limit=10")) as any;
   algList = result.data.result || [];
-  console.log('algList: ', algList); 
   loading1.value = false;
 };
 getAlgList();
-// export default {
-//   name: "PersonalRecommend",
-//   props: {},
-//   data() {
-//     return {
-//       bannerList: [],
-//       algList:[],
-//       mvList:[],
-//       privateContent:[],
-//       newSongList:[],
-//       newSongId:0,
-//       loading1:false,
-//       loading2:false,
-//       loading3:false,
-//       loading4:false,
-//     };
-//   },
-//   created() {},
-//   computed: {
-//   },
-//   components: {
-//     SongListBox: () => import("./components/SongListBox"),
-//     MvRecommend: () => import("./components/MvRecommend"),
-//     SongItemBox: () => import("./components/SongItemBox"),
-//   },
-//   methods: {
-//     ...mapState('player',['audio','playing','id']),
-//     ...mapActions('player',['getSongUrl']),
-//     async getBannerData() {
-//       const { banners = [] } = await this.$http("/banner?type=2");
-//       this.bannerList = banners;
-//     },
-//     async getAlgList() {
-//       this.loading1 = true
-//       const  {result=[]} = await this.$http("/personalized?limit=10");
-//       this.algList = result || [];
-//       this.loading1 = false
-//     },
-//     async getPrivateContent(){
-//       this.loading2 = true
-//       const data = await this.$http("/personalized/privatecontent")
-//       this.privateContent = data.result
-//       this.loading2 = false
-//     },
-//     //最新音乐
-//     async getNewSong(){
-//       this.loading3 = true
-//       const data = await this.$http("/personalized/newsong?limit=12")
-//       this.newSongList = data.result
-//       this.loading3 = false
-//     },
-//     async getPersonalizedMv(){
-//       this.loading4 = true
-//       const {result=[]} = await this.$http("/personalized/mv");
-//       this.mvList = result
-//       this.loading4 = false
-//     },
-//     //点击banner
-//     handleBannerClick(banner){
-//       if(banner.song){
-//         // this.getSongDetail(banner.song.id)
-//         if(this.id !== banner.song.id){
-//           this.getSongUrl(banner.song.id)
-//         }
-//       } else{
 
-//       }
-//     },
-//    async getSongDetail(id){
-//      let songDetail = await  this.$http(`/song/detail?ids=${id}`)
+// 获取独家放送数据
+let privateContent = reactive<MvItem[]>([]);
+const getPrivateContent = async () => {
+  loading2.value = true;
+  const { data } = await axios.get("api/personalized/privatecontent");
+  privateContent.push(...data.result);
+  loading2.value = false;
+};
+getPrivateContent();
 
-//     },
-//     //点击背景
-//     handleBgClick(id){
-//       this.newSongId = id
-//     }
-//   },
-//   mounted() {
-//     this.getBannerData();
-//     this.getAlgList()
-//     this.getPersonalizedMv()
-//     this.getPrivateContent()
-//     this.getNewSong()
-//   },
-//   watch: {},
-// };
+//最新音乐
+let focusSongId = ref(0);
+const newSongList = reactive<any[]>([]);
+const getNewSong = async () => {
+  loading3.value = true;
+  const { data } = await axios.get("api/personalized/newsong?limit=12");
+  newSongList.push(...data.result);
+  
+  loading3.value = false;
+};
+getNewSong();
+const handleBgClick = (id:number) => {
+  focusSongId.value = id
+}
+
+// 推荐MV
+const mvList = reactive<any[]>([]);
+const getPersonalizedMv = async () => {
+  loading4.value = true;
+  const { data } = await axios.get("api/personalized/mv");
+  mvList.push(...data.result);
+  loading4.value = false;
+};
+getPersonalizedMv();
 </script>
 <style scoped lang="scss">
 .personal-recomend {
@@ -201,5 +214,9 @@ getAlgList();
   &.private-content-list {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+// 整个滚动条背景
+::-webkit-scrollbar {
+  display: none;
 }
 </style>

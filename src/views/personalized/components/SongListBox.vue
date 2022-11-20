@@ -12,11 +12,11 @@
       <img :src="algInfo.picUrl"   /> 
       <span class="play-number">
         <i class="iconfont icon-play"></i>
-        <!-- <span class="number" v-if="algInfo.playCount">
-          {{algInfo.playCount | playCountFilter}}</span>-->                                     
+        <span class="number" v-if="algInfo.playCount">
+          {{formatCount(algInfo.playCount) }}</span>                                     
        </span>   
       <span class="pg-count" v-if="algInfo.programCount">声音{{algInfo.programCount}}</span>
-      <!-- <PlayBtn  :position="position"  @click.native.stop="addSongToList(algInfo.id)" :size="size" :bgFilter="true"/> -->
+      <PlayBtn  :position="position"  @click.native.stop="addSongToList(algInfo.id)" :size="size" :bgFilter="true"/>
       <!-- 歌单创建者 -->
       <p class="creator" v-if="cname">
          <i class="iconfont icon-user"></i>
@@ -33,7 +33,7 @@
 // import page from '@/mixins/page'
 // import songList from '@/mixins/songList'
 // import { mapState, mapMutations } from 'vuex'
-import { ref,defineProps ,computed } from 'vue'
+import { ref,defineProps ,computed ,inject } from 'vue'
 const props = defineProps({
   algInfo: {
     type: Object,
@@ -45,9 +45,14 @@ const props = defineProps({
       type: String,
       default: "br",
     },
+    size: {
+      type: String,
+      default: "medium",
+    },
 })
+const formatCount = inject('formatCount') as Function
 const ishover = ref(false)
-console.log('props.algInfo: ', props );
+
 let cname = computed(() => {
   if (props.algInfo.creator) {
     
@@ -55,7 +60,10 @@ let cname = computed(() => {
   }
 })
 const toSongListDetail = (id:string) => {
-  console.log(id)
+  
+}
+const addSongToList = (id:string) => {
+  
 }
 // export default {
 //   name: "SongListBox",
@@ -171,7 +179,7 @@ const toSongListDetail = (id:string) => {
   }
   .album-des{
     margin-top: 4px;
-    font-size: 16px;
+    font-size: 14px;
     color: #333;
     line-height: 1.5;
     text-align: left;
@@ -180,7 +188,7 @@ const toSongListDetail = (id:string) => {
   .album-artist{
     margin-top:0px;
     text-align: left;
-    font-size: 14px;
+    font-size: 12px;
     color:#888;
     cursor: pointer;
     &:hover{
